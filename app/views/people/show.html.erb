@@ -94,7 +94,7 @@
           <ol class="document-list">
             <% @person.previous_role_appointments.each do |appointment| %>
               <%= content_tag_for :li, appointment, class: "document-row" do %>
-                <h3><%= appointment.role_link %></h3>
+                <h3 <%= t_lang_translated_locales(appointment.role) %> ><%= appointment.role_link %></h3>
                 <ul class="attributes">
                   <li class="date"><%= appointment.date_range %></li>
                 </ul>
