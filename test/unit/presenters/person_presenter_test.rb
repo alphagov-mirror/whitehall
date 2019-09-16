@@ -49,7 +49,7 @@ class PersonPresenterTest < ActionView::TestCase
     refute @presenter.available_in_multiple_languages?
   end
 
-  test "is not available in multiple languages if any current role is not available in multiple languages" do
+  test "is available in multiple languages even if not all current role are available in multiple languages" do
     role_1 = stub_translatable_record(:role_without_organisations)
     role_1.stubs(:translated_locales).returns([:en])
     role_2 = stub_translatable_record(:role_without_organisations)
@@ -60,7 +60,7 @@ class PersonPresenterTest < ActionView::TestCase
     @person.stubs(:current_role_appointments).returns([role_appointment_1, role_appointment_2])
     @person.stubs(:translated_locales).returns(%i[en es])
 
-    assert_equal [:en], @presenter.translated_locales
+    assert_equal [:en, :es], @presenter.translated_locales
     refute @presenter.available_in_multiple_languages?
   end
 
@@ -75,7 +75,7 @@ class PersonPresenterTest < ActionView::TestCase
     @person.stubs(:current_role_appointments).returns([role_appointment_1, role_appointment_2])
     @person.stubs(:translated_locales).returns(%i[en fr es it])
 
-    assert_equal %i[en it], @presenter.translated_locales
+    assert_equal %i[en fr es it], @presenter.translated_locales
     assert @presenter.available_in_multiple_languages?
   end
 end
