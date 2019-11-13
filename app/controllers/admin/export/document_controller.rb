@@ -29,6 +29,9 @@ class Admin::Export::DocumentController < Admin::Export::BaseController
 
   def migrated
     document = Document.find(params[:id])
+    unless document.locked?
+      respond_with Hash.new, status: 422
+    end
   end
 
   private
