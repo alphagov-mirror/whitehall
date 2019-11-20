@@ -7,9 +7,7 @@
               locals: { big: true,
                         heading: "Ministers" } %>
 
-    <% unless @is_during_reshuffle %>
-      <p class="intro-paragraph">Read biographies and responsibilities of <a href="#cabinet-ministers">Cabinet ministers</a> and all <a href="#ministers-by-department">ministers by department</a>, as well as the <a href="#whips">whips</a> who help co-ordinate parliamentary business.</p>
-    <% end %>
+    <p class="intro-paragraph">Read biographies and responsibilities of <a href="#cabinet-ministers">Cabinet ministers</a> and all <a href="#ministers-by-department">ministers by department</a>, as well as the <a href="#whips">whips</a> who help co-ordinate parliamentary business.</p>
   </div>
 </header>
 
@@ -21,7 +19,7 @@
       </aside>
     </div>
   </div>
-<% else %>
+<% end %>
 
 <div class="block-2">
   <div class="inner-block floated-children">
@@ -123,5 +121,3 @@
     <% end %>
   </div>
 </div>
-
-<% end %>
