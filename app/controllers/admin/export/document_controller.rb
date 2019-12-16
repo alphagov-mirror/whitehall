@@ -33,6 +33,7 @@ class Admin::Export::DocumentController < Admin::Export::BaseController
 
     document.editions.each do |edition|
       Whitehall::InternalLinkUpdater.new(edition).call
+      edition.remove_from_search_index if edition.can_index_in_search?
     end
 
     ContentPublisher::FeaturedDocumentMigrator.new(document).call

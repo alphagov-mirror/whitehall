@@ -135,6 +135,25 @@ class Admin::Export::DocumentControllerTest < ActionController::TestCase
     assert_response :bad_request
   end
 
+  test "removes migrated document from search index" do
+    edition = create(:published_news_article)
+    login_as :export_data_user
+
+    assert_equal edition.can_index_in_search?, true
+
+    # Whitehall::SearchIndex.stubs(:delete)
+    # Whitehall::SearchIndex.expects(:delete).with(edition)
+    #
+    # Whitehall::SearchIndex::SearchIndexDeleteWorker.expects(:perform_async)
+    
+    post :migrated, params: { id: edition.document.id }, format: "json"
+
+    assert_equal edition.can_index_in_search?, false
+
+    # edition.class.searchable_instances.delete(edition)
+    # refute edition.can_index_in_search?
+  end
+
   test "calls InternalLinkUpdater when document is marked as migrated" do
     edition_linked_to = create(:edition_with_document, body: "Some document being migrated to Content Publisher")
     edition_linked_to.document.update(slug: "some-document", locked: true)
