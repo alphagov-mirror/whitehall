@@ -16,7 +16,14 @@ module FilterRoutesHelper
   end
 
   def filter_atom_feed_url
-    Whitehall::FeedUrlBuilder.new({ document_type: params.permit!.to_h[:controller].to_s }.merge(params.permit!.to_h)).url
+    Whitehall::FeedUrlBuilder.new(
+      params.permit(
+        :from_date, :page, :per_page, :to_date, :keywords, :locale, :include_world_location_news,
+        :official_document_status, :publication_type, :announcement_type, :format,
+        :publication_filter_option, :announcement_filter_option, :announcement_type_option,
+        taxons: [], subtaxons: [], topical_events: [], topics: [], departments: [], people: [], world_locations: []
+      ).to_h.merge(document_type: params[:controller].to_s),
+    ).url
   end
 
   def filter_json_url(args = {})
