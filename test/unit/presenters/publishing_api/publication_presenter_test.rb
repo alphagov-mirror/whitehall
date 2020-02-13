@@ -284,6 +284,7 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
     presented_publication = PublishingApi::PublicationPresenter.new(publication)
 
     attachments = presented_publication.content[:details][:attachments]
+    puts attachments
     assert_equal 1, attachments.length
     assert_not attachments[0][:accessible]
     assert_not_nil attachments[0][:alternative_format_contact_email]
@@ -300,6 +301,7 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
     presented_publication = PublishingApi::PublicationPresenter.new(publication)
 
     attachments = presented_publication.content[:details][:attachments]
+    puts attachments
     assert_equal 1, attachments.length
     assert_not_nil attachments[0][:preview_url]
   end
