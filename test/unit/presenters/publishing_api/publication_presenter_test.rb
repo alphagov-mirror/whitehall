@@ -274,9 +274,10 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
   end
 
   test "accessibility metadata is included" do
-    publication = create(:published_publication, alternative_format_contact_email: "email-address", attachments: [
+    publication = create(:published_publication, attachments: [
       attachment = build(:file_attachment, id: 1, title: "csv attachment", locale: "en", accessible: false),
     ])
+    publication.stubs(:alternative_format_contact_email).returns("email-address")
     attachment.stubs(:attachable).returns(publication)
 
     presented_publication = PublishingApi::PublicationPresenter.new(publication)
