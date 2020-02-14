@@ -274,7 +274,7 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
   end
 
   test "accessibility metadata is included" do
-    publication = create(:published_publication, attachments: [
+    publication = create(:published_publication, :with_alternative_format_provider, attachments: [
       attachment = build(:file_attachment, id: 1, title: "csv attachment", locale: "en", accessible: false),
     ])
     publication.stubs(:alternative_format_contact_email).returns("email-address")
@@ -290,7 +290,7 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
   end
 
   test "csv attachments get a preview URL" do
-    publication = create(:published_publication, attachments: [
+    publication = create(:published_publication, :with_alternative_format_provider, attachments: [
       attachment = build(:file_attachment, id: 1, title: "csv attachment", locale: "en"),
     ])
     attachment.stubs(:attachable).returns(publication)
