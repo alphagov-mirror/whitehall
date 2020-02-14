@@ -273,30 +273,26 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
     end
   end
 
-  test "file attachments get a preview URL" do
-    publication = create(:published_publication)
-    publication.stubs(:attachments).returns(
-      [
-        build(:file_attachment, id: 1, title: "csv attachment", locale: "en", accessible: false),
-      ],
-    )
+  test "accessibility metadata is included" do
+    publication = create(:published_publication, alternative_format_contact_email: "email-address", attachments: [
+      attachment = build(:file_attachment, id: 1, title: "csv attachment", locale: "en", accessible: false),
+    ])
+    attachment.stubs(:attachable).returns(publication)
 
     presented_publication = PublishingApi::PublicationPresenter.new(publication)
 
     attachments = presented_publication.content[:details][:attachments]
     puts attachments
     assert_equal 1, attachments.length
-    assert_not attachments[0][:accessible]
-    assert_not_nil attachments[0][:alternative_format_contact_email]
+    assert_equal false, attachments[0][:accessible]
+    assert_equal "email-address", attachments[0][:alternative_format_contact_email]
   end
 
   test "csv attachments get a preview URL" do
-    publication = create(:published_publication)
-    publication.stubs(:attachments).returns(
-      [
-        build(:csv_attachment, id: 1, title: "csv attachment", locale: "en"),
-      ],
-    )
+    publication = create(:published_publication, attachments: [
+      attachment = build(:file_attachment, id: 1, title: "csv attachment", locale: "en"),
+    ])
+    attachment.stubs(:attachable).returns(publication)
 
     presented_publication = PublishingApi::PublicationPresenter.new(publication)
 
