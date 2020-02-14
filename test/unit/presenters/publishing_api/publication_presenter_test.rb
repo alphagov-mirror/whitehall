@@ -293,13 +293,11 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
     publication = create(:published_publication, :with_alternative_format_provider, attachments: [
       attachment = build(:file_attachment, id: 1, title: "csv attachment", locale: "en"),
     ])
-    attachment_data = Object.new
-    attachment_data.stubs(:csv?).returns(true)
-    attachment_data.stubs(:id).returns(42)
-    attachment_data.stubs(:filename).returns("list_of_wizards")
-    attachment_data.stubs(:filename_without_extension).returns("csv")
-    attachment.stubs(:attachment_data).returns(attachment_data)
     attachment.stubs(:attachable).returns(publication)
+    attachment.stubs(:attachment_data).returns(
+      attachment_data = build(:attachment_data),
+    )
+    attachment_data.stubs(:csv?).returns(true)
 
     presented_publication = PublishingApi::PublicationPresenter.new(publication)
 
