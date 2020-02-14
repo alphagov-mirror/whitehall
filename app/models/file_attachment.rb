@@ -58,7 +58,7 @@ private
 
   def preview_url
     if csv? && attachable.is_a?(Edition)
-      csv_preview_path(
+      csv_preview_url(
         id: attachment_data.id,
         file: filename_without_extension,
         extension: file_extension,
