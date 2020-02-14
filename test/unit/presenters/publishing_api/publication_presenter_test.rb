@@ -295,7 +295,7 @@ class PublishingApi::PublicationPresenterTest < ActiveSupport::TestCase
     ])
     attachment.stubs(:attachable).returns(publication)
     attachment.stubs(:attachment_data).returns(
-      attachment_data = build(:attachment_data),
+      attachment_data = build(:attachment_data, id: 42, filename_without_extension: "list-of-wizards", file_extension: "csv"),
     )
     attachment_data.stubs(:csv?).returns(true)
 
