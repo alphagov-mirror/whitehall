@@ -58,7 +58,7 @@ private
 
   def preview_url
     if csv? && attachable.is_a?(Edition)
-      csv_preview_url(
+      Whitehall.url_maker.csv_preview_url(
         id: attachment_data.id,
         file: filename_without_extension,
         extension: file_extension,
