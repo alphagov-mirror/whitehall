@@ -4,11 +4,10 @@ class DocumentTest < ActiveSupport::TestCase
   include GdsApi::TestHelpers::PublishingApi
 
   test "should return documents that have published editions" do
-    create(:superseded_publication)
+    superseded_publication = create(:superseded_publication)
     create(:draft_publication)
-    published_publication = create(:published_publication)
 
-    assert_equal [published_publication.document], Document.published
+    assert_equal [superseded_publication.document], Document.published
   end
 
   test "should return the published edition" do
@@ -148,15 +147,17 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "#ever_published_editions returns all editions that have ever been published or withdrawn" do
-    document = create(:document)
-    superseded = create(:superseded_edition, document: document)
-    withdrawn = create(:edition, state: "withdrawn", document: document)
-    current = create(:published_edition, document: document)
+    superseded_edition = create(:superseded_edition)
+    assert_equal(
+      %w[superseded published],
+      superseded_edition.document.ever_published_editions.pluck(:state),
+    )
 
-    assert_equal [superseded, withdrawn, current], document.ever_published_editions
-
-    current.withdraw!
-    assert_equal [superseded, withdrawn, current], document.reload.ever_published_editions
+    withdrawn_edition = create(:edition, state: "withdrawn")
+    assert_equal(
+      %w[withdrawn],
+      withdrawn_edition.document.ever_published_editions.pluck(:state),
+    )
   end
 
   test "#humanized_document_type should return document type in a user friendly format" do
