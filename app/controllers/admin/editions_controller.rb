@@ -154,6 +154,9 @@ class Admin::EditionsController < Admin::BaseController
           .limit(1)
           .first
 
+      puts "Editions found: #{Edition.unscoped.pluck(:id, :state)}"
+      puts "Probably last published edition = id: #{probably_last_published_edition.id}, state: #{probably_last_published_edition.state}"
+
       new_draft = probably_last_published_edition.create_draft(
         current_user,
         allow_creating_draft_from_deleted_edition: true,
