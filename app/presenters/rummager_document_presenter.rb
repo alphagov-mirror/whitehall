@@ -103,6 +103,14 @@ class RummagerDocumentPresenter < ActionView::Base
     }
   end
 
+  def marshal_dump
+    as_hash
+  end
+
+  def marshal_load(hash)
+    RummagerDocumentPresenter.new(hash)
+  end
+
 private
 
   def format_link(title, link)
