@@ -8,51 +8,13 @@ class SearchableTest < ActiveSupport::TestCase
     self.table_name = "classifications"
 
     include Searchable
-    searchable link: :name, only: :publicly_visible, index_after: [:save], unindex_after: [:destroy]
+    searchable link: :name, only: :publicly_visible
 
     scope :publicly_visible, -> { where(state: %w[published withdrawn]) }
   end
 
   def setup
     RummagerPresenters.stubs(:searchable_classes).returns([SearchableTestTopic])
-  end
-
-  test "will not request indexing on save if it is not in searchable_instances" do
-    searchable_test_topic = SearchableTestTopic.new(name: "woo", state: "draft")
-    Whitehall::SearchIndex.expects(:add).never
-    searchable_test_topic.save!
-  end
-
-  test "will request indexing on save if it is in searchable_instances" do
-    searchable_test_topic = SearchableTestTopic.create!(name: "woo", state: "published")
-    Whitehall::SearchIndex.expects(:add).with(searchable_test_topic)
-    searchable_test_topic.save!
-  end
-
-  test "will request indexing on save if it is in searchable_instances and withrawn" do
-    searchable_test_topic = SearchableTestTopic.create!(name: "woo", state: "withdrawn")
-    Whitehall::SearchIndex.expects(:add).with(searchable_test_topic)
-    searchable_test_topic.save!
-  end
-
-  test "will request deletion on destruction even if it is not in searchable_instances" do
-    searchable_test_topic = SearchableTestTopic.create!(name: "woo", state: "draft")
-    Whitehall::SearchIndex.expects(:delete).with(searchable_test_topic)
-    searchable_test_topic.destroy!
-  end
-
-  test "will request deletion on destruction if it is contained in searchable_instances" do
-    searchable_test_topic = SearchableTestTopic.create!(name: "woo", state: "published")
-    Whitehall::SearchIndex.expects(:delete).with(searchable_test_topic)
-    searchable_test_topic.destroy!
-  end
-
-  test "will only request indexing of things that are included in the RummagerPresenters.searchable_classes property" do
-    class NonExistentClass; end
-    RummagerPresenters.stubs(:searchable_classes).returns([NonExistentClass])
-    searchable_test_topic = SearchableTestTopic.new(name: "woo", state: "published")
-    Whitehall::SearchIndex.expects(:add).never
-    searchable_test_topic.save!
   end
 
   test "#reindex_all will not request indexing for an instance whose class is not in RummagerPresenters.searchable_classes" do

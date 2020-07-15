@@ -75,9 +75,7 @@ class StatisticsAnnouncement < ApplicationRecord
               public_timestamp: :updated_at,
               release_timestamp: :release_date,
               statistics_announcement_state: :state,
-              metadata: :search_metadata,
-              index_after: [],
-              unindex_after: []
+              metadata: :search_metadata
 
   delegate :release_date,
            :display_date,

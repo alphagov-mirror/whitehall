@@ -66,13 +66,8 @@ module Searchable
       self.searchable_options = options.reverse_merge \
         format: ->(o) { o.class.model_name.element },
         content_id: ->(o) { o.try(:content_id) },
-        index_after: :save,
-        unindex_after: :destroy,
         only: :all,
         description: ""
-
-      searchable_options[:index_after] = [searchable_options[:index_after]].flatten.select { |e| e }
-      searchable_options[:unindex_after] = [searchable_options[:unindex_after]].flatten.select { |e| e }
 
       (SEARCH_FIELDS + [:only]).each do |name|
         value = searchable_options[name]
@@ -87,13 +82,6 @@ module Searchable
             # treat other objects (e.g. strings) as constants
             ->(_) { value }
           end
-      end
-
-      searchable_options[:index_after].each do |event|
-        set_callback event, :after, :update_in_search_index
-      end
-      searchable_options[:unindex_after].each do |event|
-        set_callback event, :after, :remove_from_search_index
       end
     end
   end

@@ -61,16 +61,11 @@ For a list of searchable classes, please refer to `Whitehall.edition_classes`
 
 Indexing for searchable classes that inherit from `Edition` is triggered via the
 `ServiceListeners::SearchIndexer` listening to the `force_publish` and `publish`
-events. Since `Edition` sets the `index_after` key in its searchable options hash to
-`[]`, classes inheriting from it don't trigger indexing when saved.
+events.
 
 To trigger indexing for an instance of these classes in unit/integration tests,
 create an instance in a valid publishing state ('submitted', 'rejected') and
 call `EditionService.new(your_instance).perform!`.
-
-Indexing for additional searchable classes is triggered by save. This behaviour
-is defined in `Searchable.searchable_options`, where the `index_after` is set to
-`:save` as a default.
 
 To trigger indexing for an instance of these classes in unit/integration tests,
 create an instance in a valid publishing state ('submitted', 'rejected') and

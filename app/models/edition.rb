@@ -315,8 +315,6 @@ EXISTS (
     relevant_to_local_government: :relevant_to_local_government?,
     world_locations: nil,
     only: :search_only,
-    index_after: [],
-    unindex_after: [],
     search_format_types: :search_format_types,
     attachments: nil,
     operational_field: nil,
