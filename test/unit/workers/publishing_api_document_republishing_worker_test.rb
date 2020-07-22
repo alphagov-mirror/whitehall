@@ -15,8 +15,11 @@ class PublishingApiDocumentRepublishingWorkerTest < ActiveSupport::TestCase
 
     Document.stubs(:find).returns(document)
 
-    PublishingApiWorker.expects(:new).returns(api_worker = mock)
-    api_worker.expects(:perform).with(published_edition.class.name, published_edition.id, "republish", "en", false)
+    Whitehall::PublishingApi.expects(:publish).with(
+      published_edition,
+      "republish",
+      false,
+    )
 
     Whitehall::PublishingApi
       .expects(:save_draft)
@@ -48,8 +51,7 @@ class PublishingApiDocumentRepublishingWorkerTest < ActiveSupport::TestCase
 
     Document.stubs(:find).returns(document)
 
-    PublishingApiWorker.stubs(:new).returns(api_worker = mock)
-    api_worker.stubs(:perform).raises(PublishException)
+    Whitehall::PublishingApi.stubs(:publish).raises(PublishException)
     Whitehall::PublishingApi.stubs(:save_draft).raises(DraftException)
 
     assert_raises PublishException do
@@ -78,7 +80,7 @@ class PublishingApiDocumentRepublishingWorkerTest < ActiveSupport::TestCase
     PublishingApiDocumentRepublishingWorker.new.perform(document.id)
 
     assert_all_requested(requests)
-    assert_requested(patch_links_request, times: 2)
+    assert_requested(patch_links_request, times: 1)
   end
 
   test "it runs the PublishingApiUnpublishingWorker if the latest edition has an unpublishing" do
@@ -103,8 +105,12 @@ class PublishingApiDocumentRepublishingWorkerTest < ActiveSupport::TestCase
     )
 
     Document.stubs(:find).returns(document)
-    PublishingApiWorker.expects(:new).returns(api_worker = mock)
-    api_worker.expects(:perform).with(published_edition.class.name, published_edition.id, "republish", "en", false)
+
+    Whitehall::PublishingApi.expects(:publish).with(
+      published_edition,
+      "republish",
+      false,
+    )
 
     PublishingApiUnpublishingWorker.expects(:new).returns(unpublishing_worker = mock)
     unpublishing_worker.expects(:perform).with(published_edition.unpublishing.id, false)
@@ -150,11 +156,11 @@ class PublishingApiDocumentRepublishingWorkerTest < ActiveSupport::TestCase
 
     Document.stubs(:find).returns(document)
 
+    Whitehall::PublishingApi.stubs(:publish).raises
+    Whitehall::PublishingApi.stubs(:save_draft).raises
+
     raising_worker = mock
     raising_worker.stubs(:perform).raises
-
-    PublishingApiWorker.stubs(:new).returns(raising_worker)
-    Whitehall::PublishingApi.stubs(:save_draft).raises
     PublishingApiUnpublishingWorker.stubs(:new).returns(raising_worker)
 
     assert_nothing_raised do
