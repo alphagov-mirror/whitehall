@@ -1,6 +1,12 @@
 <fieldset class="excluded_nations <% if edition.errors[:nation_inapplicabilities].any? %>alert-danger form-errors field_with_errors<% end %>" >
   <legend>Excluded nations</legend>
 
+  <div class="checkbox">
+    <%= label_tag 'edition_apply_universally', class: [:checkbox, "js-toggle-national-applicability-fields"] do %>
+      <%= check_box_tag 'edition[all_nation_applicability]', "1", false %> Applies to all UK nations
+    <% end %>
+  </div>
+
   <% Nation.potentially_inapplicable.each do |nation| %>
     <% inapplicability = edition.nation_inapplicabilities.detect {|i| i.nation == nation } || edition.nation_inapplicabilities.build(nation: nation) %>
 

@@ -13,11 +13,24 @@ module Edition::NationalApplicability
     has_many :nation_inapplicabilities, foreign_key: :edition_id, dependent: :destroy, autosave: true
     validates_associated :nation_inapplicabilities
     validates :nation_inapplicabilities, length: { maximum: Nation.all.count - 1, message: "can not exclude all nations" }
-
     add_trait Trait
   end
 
+  def all_nation_applicability=(attributes)
+    @all_nation_applicability ||= ActiveRecord::Type::Boolean.new.deserialize(attributes)
+  end
+
+  def apply_universally=(attributes)
+    @apply_universally ||= ActiveRecord::Type::Boolean.new.deserialize(attributes)
+  end
+
   def nation_inapplicabilities_attributes=(attributes)
+    if @apply_universally
+      nation_inapplicabilities.each do |inapplicability|
+        inapplicability.mark_for_destruction
+      end
+      return
+    end
     attributes.each_value do |params|
       existing = nation_inapplicabilities.detect { |ni| ni.nation_id == params[:nation_id].to_i }
 
