@@ -123,6 +123,62 @@ module TestsForNationalApplicability
       assert_equal detailed_guide.national_applicability, expected_national_applicability
     end
 
+    view_test "edit displays edition form with nation inapplicability fields and values" do
+      edition = create_edition(all_nation_applicability: "1")
+      edition.nation_inapplicabilities.create!(nation: Nation.northern_ireland, alternative_url: "http://www.discovernorthernireland.com/")
+
+      get :edit, params: { id: edition }
+
+      assert_select "form#edit_edition" do
+        assert_nation_inapplicability_fields_exist
+        assert_nation_inapplicability_fields_set_as(index: 0, checked: false)
+        assert_nation_inapplicability_fields_set_as(index: 1, checked: false)
+        assert_nation_inapplicability_fields_set_as(index: 2, checked: false)
+        assert_nation_inapplicability_fields_set_as(index: 3, checked: true, alternative_url: "http://www.discovernorthernireland.com/")
+      end
+    end
+
+    view_test "creating with all nations excluded should fail validation" do
+      create(:government)
+      attributes = attributes_for_edition
+
+      all_nations = nation_inapplicabilities_attributes_for({
+        Nation.england => "http://www.england.com/",
+        Nation.scotland => "http://www.scotland.com/",
+        Nation.wales => "http://www.wales.com/",
+        Nation.northern_ireland => "http://www.ni.com/"
+        })
+
+      post :create, params: { edition: attributes.merge(all_nations) }
+
+      assert_nil Edition.last
+
+      assert_page_has_error("Excluded nations can not exclude all nations")
+    end
+
+    view_test "creating with no applicability options should fail validation" do
+      create(:government)
+
+      post :create, params: { edition: attributes_for_edition}
+
+      assert_nil Edition.last
+
+      assert_page_has_error("Excluded nations must either allow all nations or exclude at least one nation")
+    end
+
+    test "creating with all_nation_applicability and an excluded nation should fail validation" do
+      create(:government)
+
+      post :create, params: {
+        edition: attributes_for_edition.merge(
+          nation_inapplicabilities_attributes_for(Nation.scotland => "http://www.scotland.com/"),
+          all_nation_applicability: "1"
+        )
+      }
+
+      assert_page_has_error("Excluded nations one or the other please")
+    end
+
     view_test "creating with invalid edition data should not lose the nation inapplicability fields or values" do
       attributes = attributes_for_edition
       post :create,
@@ -155,29 +211,18 @@ module TestsForNationalApplicability
       assert_nation_inapplicability_fields_set_as(index: 3, checked: false)
     end
 
-    view_test "edit displays edition form with nation inapplicability fields and values" do
-      edition = create_edition(all_nation_applicability: "1")
-      edition.nation_inapplicabilities.create!(nation: Nation.northern_ireland, alternative_url: "http://www.discovernorthernireland.com/")
-
-      get :edit, params: { id: edition }
-
-      assert_select "form#edit_edition" do
-        assert_nation_inapplicability_fields_exist
-        assert_nation_inapplicability_fields_set_as(index: 0, checked: false)
-        assert_nation_inapplicability_fields_set_as(index: 1, checked: false)
-        assert_nation_inapplicability_fields_set_as(index: 2, checked: false)
-        assert_nation_inapplicability_fields_set_as(index: 3, checked: true, alternative_url: "http://www.discovernorthernireland.com/")
-      end
-    end
-
     test "updating should save modified edition with nation inapplicabilities" do
       create(:government)
-      attributes = ({all_nation_applicability: "1"}).merge(attributes_for_edition)
+      attributes = ({all_nation_applicability: 1}).merge(attributes_for_edition)
       edition = create_edition(attributes)
 
       assert_equal 0, edition.inapplicable_nations.size
     end
 
+    test "updating should save modified edition with all nation applicability overiding exclusions" do
+      create(:government)
+      attributes = ({all_nation_applicability: 1}).merge(attributes_for_edition)
+      edition = create_edition(attributes)
       northern_ireland_inapplicability = edition.nation_inapplicabilities.create!(nation: Nation.northern_ireland, alternative_url: "http://www.discovernorthernireland.com/")
 
       assert_equal [Nation.northern_ireland], edition.inapplicable_nations
@@ -282,7 +327,7 @@ private
 
   def nation_inapplicabilities_attributes_for(nations_vs_urls, *existing_applicabilities)
     result = {}
-    [Nation.scotland, Nation.wales, Nation.northern_ireland].each.with_index do |nation, index|
+    [Nation.england, Nation.scotland, Nation.wales, Nation.northern_ireland].each.with_index do |nation, index|
       h = result[index.to_s] = {
         excluded: (nations_vs_urls.key?(nation) ? "1" : "0"),
         nation_id: nation,
@@ -296,6 +341,11 @@ private
       end
     end
     { nation_inapplicabilities_attributes: result }
+  end
+
+
+  def assert_page_has_error(error)
+    assert_select(".errors", text: error)
   end
 
   def assert_nation_inapplicability_fields_set_as(attributes)
