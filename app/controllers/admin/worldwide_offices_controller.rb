@@ -4,6 +4,10 @@ class Admin::WorldwideOfficesController < Admin::BaseController
 
   def index; end
 
+  def add_to_home_page; end
+
+  def remove_from_home_page; end
+
   def new
     @worldwide_office = @worldwide_organisation.offices.build
     @worldwide_office.build_contact
