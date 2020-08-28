@@ -17,8 +17,8 @@ class DataHygiene::BulkOrganisationUpdaterTest < ActiveSupport::TestCase
 
   test "it fails with invalid CSV data" do
     csv_file = <<~CSV
-      document slug,new lead organisation,supporting organisations
-      this-is-a-slug,new-organisation,new-supporting-organisation
+      document slug,document type,new lead organisation,supporting organisations
+      this-is-a-slug,,new-organisation,new-supporting-organisation
     CSV
 
     assert_raises KeyError do
@@ -28,8 +28,8 @@ class DataHygiene::BulkOrganisationUpdaterTest < ActiveSupport::TestCase
 
   test "it changes the lead organisations" do
     csv_file = <<~CSV
-      Slug,New lead organisations,New supporting organisations
-      this-is-a-slug,lead-organisation,
+      Slug,Document type,New lead organisations,New supporting organisations
+      this-is-a-slug,,lead-organisation,
     CSV
 
     document = create(:document, slug: "this-is-a-slug")
@@ -45,8 +45,8 @@ class DataHygiene::BulkOrganisationUpdaterTest < ActiveSupport::TestCase
 
   test "it changes the supporting organisations" do
     csv_file = <<~CSV
-      Slug,New lead organisations,New supporting organisations
-      this-is-a-slug,,"supporting-organisation-1,supporting-organisation-2"
+      Slug,Document type,New lead organisations,New supporting organisations
+      this-is-a-slug,,,"supporting-organisation-1,supporting-organisation-2"
     CSV
 
     document = create(:document, slug: "this-is-a-slug")
@@ -63,8 +63,8 @@ class DataHygiene::BulkOrganisationUpdaterTest < ActiveSupport::TestCase
 
   test "it just updates the draft when there is not a change to the published edition" do
     csv_file = <<~CSV
-      Slug,New lead organisations,New supporting organisations
-      this-is-a-slug,lead-organisation,
+      Slug,Document type,New lead organisations,New supporting organisations
+      this-is-a-slug,,lead-organisation,
     CSV
 
     document = create(:document, slug: "this-is-a-slug")
@@ -89,8 +89,8 @@ class DataHygiene::BulkOrganisationUpdaterTest < ActiveSupport::TestCase
 
   test "it doesn't change a document which has already changed" do
     csv_file = <<~CSV
-      Slug,New lead organisations,New supporting organisations
-      this-is-a-slug,lead-organisation,"supporting-organisation-1,supporting-organisation-2"
+      Slug,Document type,New lead organisations,New supporting organisations
+      this-is-a-slug,,lead-organisation,"supporting-organisation-1,supporting-organisation-2"
     CSV
 
     lead_organisation = create(:organisation, slug: "lead-organisation")
