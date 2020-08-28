@@ -36,6 +36,7 @@ module DataHygiene
     def find_document(row)
       slug = row.fetch("Slug")
 
+      return if slug.nil?
       return if slug.strip.empty?
 
       document = Document.find_by(slug: slug)
