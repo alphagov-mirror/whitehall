@@ -50,6 +50,10 @@ class DocumentCollection < Edition
     groups.flat_map(&:content_ids)
   end
 
+  def translatable?
+    true
+  end
+
 private
 
   def create_default_group
