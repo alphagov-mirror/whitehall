@@ -415,6 +415,7 @@ module PublishingApi
           service_type: account.service_name.parameterize,
           title: account.display_name,
           href: account.url,
+          locale: account.locale,
         }
       end
     end
